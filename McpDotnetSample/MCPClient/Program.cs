@@ -4,7 +4,7 @@
 var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
 {
   Name = "MCP Server",
-  Command = @"C:\Users\nursel.altin\source\repos\McpDotnetSample\McpDotnetSample\MCPServer\bin\Debug\net7.0\MCPServer.exe"
+  Command = @"\McpDotnetSample\McpDotnetSample\MCPServer\bin\Debug\net7.0\MCPServer.exe"
 });
 
 // MCP Client nesnesini oluşturuyoruz ve server'a bağlanıyoruz
@@ -15,5 +15,14 @@ var tools = await client.ListToolsAsync();
 
 foreach (var tool in tools)
 {
-  Console.WriteLine(tool);
+  Console.WriteLine($"Tool: {tool.Name} - {tool.Description}");
+  if (tool.Name == "Execute")
+    continue;
+  // Tool'a input gönder ve sonucu bekle
+  var result = await tool.CallAsync(new Dictionary<string, object?>
+  {
+    ["input"] = "URGENT: Your PayPal account has been suspended. Please login to verify your identity."
+  });
+
+  Console.WriteLine($"Sonuç: {result}");
 }
