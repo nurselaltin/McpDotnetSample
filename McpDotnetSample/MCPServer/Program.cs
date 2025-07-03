@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MCPServer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
-
+builder.Services.AddSingleton<AIAgent>();
 //Serilog ayarları
 Log.Logger = new LoggerConfiguration()
   .MinimumLevel.Information()
@@ -26,6 +27,14 @@ builder.Services
   .AddMcpServer()
   .WithStdioServerTransport()
   .WithToolsFromAssembly();
+
+//var input = "Hot singles in your area want to meet you!  \nCreate your free profile and start chatting now.";
+//AIAgent c = new AIAgent();
+//var yy = c.IsSuspiciousInput(input);
+//if (yy)
+//{
+//  var yyy = "";
+//}
 
 await builder.Build().RunAsync();
 
