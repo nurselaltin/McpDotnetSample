@@ -20,13 +20,13 @@ namespace MCPServer.Tools
     {
       if (!_agent.CanUseTool("SpamClassifierTool"))
       {
-        Log.Information("SpamClassifierTool sistem prompt tarafından engellendi.");
+        Log.Warning("SpamClassifierTool sistem prompt tarafından engellendi.");
         return Task.FromResult("Bu tool sistem prompt tarafından engellendi.");
       }
 
       if (_agent.IsSuspiciousInput(input))
       {
-        Log.Information("Prompt injection tespit edildi.");
+        Log.Warning("Prompt injection tespit edildi.");
         return Task.FromResult("Yemedim yavrum injectionını :)");
       }
 
