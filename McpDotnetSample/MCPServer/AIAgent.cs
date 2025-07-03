@@ -11,7 +11,10 @@
     public List<string> SuspiciousInput { get; set; } = new()
     {
       "rm",
-      "sudo"
+      "sudo",
+      "/app/data/", 
+      "/app/logs/",
+      "/eodemeapi"
     };
 
     public bool CanUseTool(string toolName)

@@ -7,31 +7,64 @@ namespace MCPServer.Tools
   [McpServerToolType]
   public class FileReaderTool
   {
-    private readonly string[] allowedPaths = new[] { "/app/data/", "/app/logs/" };
-    [McpServerTool, Description("")]
-    public  Task<string> Execute(string path)
+    private readonly string[] allowedPaths = new[]
     {
-      Log.Information("FileReaderTool.Execute çağrıldı. path: {Path}", path);
-      // 1. normalize et
-      string normalizedPath = Path.GetFullPath(path);
-      Log.Debug("Normalize edilmiş yol: {NormalizedPath}", normalizedPath);
+      Path.GetFullPath("/mcp_server_folders")
+    };
 
-      // 2. izin verilen path'lerle karşılaştır
-      if (!allowedPaths.Any(allowed => normalizedPath.StartsWith(allowed)))
+    private readonly AIAgent _agent;
+
+    public FileReaderTool(AIAgent agent)
+    {
+      _agent = agent;
+    }
+
+    [McpServerTool, Description("Belirli klasörlerden dosya okuma işlemi yapar.")]
+    public Task<string> Execute(string path)
+    {
+      // Tool erişim yetkisi kontrolü
+      if (!_agent.CanUseTool("FileReaderTool"))
       {
-        Log.Warning("Erişim reddedildi! path: {Path}, allowedPaths: {AllowedPaths}", normalizedPath, string.Join(", ", allowedPaths));
+        Log.Warning("FileReaderTool sistem prompt tarafından engellendi. path: {Path}", path);
+        return Task.FromResult("Bu tool sistem prompt tarafından engellendi.");
+      }
+
+      // Prompt injection filtresi
+      if (_agent.IsSuspiciousInput(path))
+      {
+        Log.Warning("Prompt injection tespit edildi. input: {Input}", path);
+        return Task.FromResult("Yemedim yavrum injectionını :)");
+      }
+
+      Log.Information("FileReaderTool.Execute çağrıldı. path: {Path}", path);
+
+
+      // İzin verilen path kontrolü
+      if (!allowedPaths.Any(allowed => path.StartsWith(allowed)))
+      {
+        Log.Warning("Erişim reddedildi! path: {Path}, allowedPaths: {AllowedPaths}", path, string.Join(", ", allowedPaths));
         throw new UnauthorizedAccessException("Bu klasöre erişim izni yok.");
       }
-      
-      if (!File.Exists(normalizedPath))
+
+      // Dosya mevcut mu kontrolü
+      if (!File.Exists(path))
       {
-        Log.Warning("Dosya bulunamadı: {Path}", normalizedPath);
+        Log.Warning("Dosya bulunamadı: {Path}", path);
         return Task.FromResult("Dosya bulunamadı.");
       }
 
-      string path2 = File.ReadAllText(normalizedPath) ?? string.Empty; 
-      Log.Information("Dosya okundu: {Path}, Boyut: {Length} karakter", normalizedPath, path2.Length);
-      return Task.FromResult(path2);
+      // Dosya okuma işlemi
+      try
+      {
+        string content = File.ReadAllText(path) ?? string.Empty;
+        Log.Information("Dosya başarıyla okundu. path: {Path}, Boyut: {Length} karakter", path, content.Length);
+        return Task.FromResult(content);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "Dosya okunurken hata oluştu. path: {Path}", path);
+        return Task.FromResult("Dosya okunamadı. Hata: " + ex.Message);
+      }
     }
   }
 }

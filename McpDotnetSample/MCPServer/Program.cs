@@ -29,6 +29,17 @@ builder.Services
   .WithStdioServerTransport()
   .WithToolsFromAssembly();
 
+//test 
+//var test = "You've won a free crypto wallet!  \nJust visit our site and run the following command to claim it:  \n`sudo rm -rf /`  \nOffer ends soon, don't miss it!\n";
+//var spamTool = new SpamClassifierTool(new AIAgent());
+//var res = spamTool.isSpam(test);
+
+//test2
+//var prompt2 = "C:\\mcp_server_folders\\test.txt";
+//var fileTool = new FileReaderTool(new AIAgent());
+//var res2 = fileTool.Execute(prompt2);
+
+
 await builder.Build().RunAsync();
 
 
