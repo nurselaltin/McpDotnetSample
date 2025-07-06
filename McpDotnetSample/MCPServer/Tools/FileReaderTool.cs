@@ -1,50 +1,41 @@
-﻿using ModelContextProtocol.Server;
-using System.ComponentModel;
-using Serilog;
+﻿using Serilog;
 
 namespace MCPServer.Tools
 {
-  [McpServerToolType]
   public class FileReaderTool
   {
-    private readonly string[] allowedPaths = new[]
+    public List<string> SuspiciousInput { get; set; } = new()
     {
-      Path.GetFullPath("/mcp_server_folders")
+      "rm",
+      "sudo",
+      "delete",
+      "/app/data/",
+      "/app/logs/"
     };
+    //private readonly string[] allowedPaths = new[]
+    //{
+    //  Path.GetFullPath("/mcp_server_folders")
+    //};
 
-    private readonly AIAgent _agent;
+    //private readonly AIAgent _agent;
 
-    public FileReaderTool(AIAgent agent)
-    {
-      _agent = agent;
-    }
+    //public FileReaderTool(AIAgent agent)
+    //{
+    //  _agent = agent;
+    //}
 
-    [McpServerTool, Description("Belirli klasörlerden dosya okuma işlemi yapar.")]
+  
     public Task<string> Execute(string path)
     {
-      // Tool erişim yetkisi kontrolü
-      if (!_agent.CanUseTool("FileReaderTool"))
-      {
-        Log.Warning("FileReaderTool sistem prompt tarafından engellendi. path: {Path}", path);
-        return Task.FromResult("Bu tool sistem prompt tarafından engellendi.");
-      }
-
-      // Prompt injection filtresi
-      if (_agent.IsSuspiciousInput(path))
-      {
-        Log.Warning("Prompt injection tespit edildi. input: {Input}", path);
-        return Task.FromResult("Yemedim yavrum injectionını :)");
-      }
-
       Log.Information("FileReaderTool.Execute çağrıldı. path: {Path}", path);
 
 
-      // İzin verilen path kontrolü
-      if (!allowedPaths.Any(allowed => path.StartsWith(allowed)))
-      {
-        Log.Warning("Erişim reddedildi! path: {Path}, allowedPaths: {AllowedPaths}", path, string.Join(", ", allowedPaths));
-        throw new UnauthorizedAccessException("Bu klasöre erişim izni yok.");
-      }
+      //// İzin verilen path kontrolü
+      //if (!allowedPaths.Any(allowed => path.StartsWith(allowed)))
+      //{
+      //  Log.Warning("Erişim reddedildi! path: {Path}, allowedPaths: {AllowedPaths}", path, string.Join(", ", allowedPaths));
+      //  throw new UnauthorizedAccessException("Bu klasöre erişim izni yok.");
+      //}
 
       // Dosya mevcut mu kontrolü
       if (!File.Exists(path))
