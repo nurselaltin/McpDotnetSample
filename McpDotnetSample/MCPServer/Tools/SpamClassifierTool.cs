@@ -14,6 +14,7 @@ namespace MCPServer.Tools
     //{
     //  _agent = agent;
     //}
+    
     public  Task<string> isSpam(string input)
     {
       //if (!_agent.CanUseTool("SpamClassifierTool"))

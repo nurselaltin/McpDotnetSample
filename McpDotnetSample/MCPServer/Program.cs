@@ -10,7 +10,6 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddSingleton<AIAgentTool>();
 builder.Services.AddSingleton<FileReaderTool>();
 builder.Services.AddSingleton<SpamClassifierTool>();
-
 builder.Services.AddSingleton<AIAgentTool>(sp =>
 {
   var fileReader = sp.GetRequiredService<FileReaderTool>();
@@ -19,7 +18,6 @@ builder.Services.AddSingleton<AIAgentTool>(sp =>
 
   return new AIAgentTool(fileReader, spam);
 });
-builder.Configuration.AddUserSecrets<Program>();
 
 //Serilog ayarları
 Log.Logger = new LoggerConfiguration()
@@ -43,9 +41,11 @@ builder.Services
   .WithStdioServerTransport()
   .WithToolsFromAssembly();
 
-var ai = new AIAgentTool(new FileReaderTool(), new SpamClassifierTool());
+//var ai = new AIAgentTool(new FileReaderTool(), new SpamClassifierTool());
+//string prompt = "Congratulations! You've won a free vacation to the Maldives. Click here to claim your prize: http://spammy-offers.biz/win";
+//string prompt2 = "C:\\mcp_server_folders\\test.txt";
+//var res = ai.Execute(prompt2);
 
-
-await builder.Build().RunAsync();
+builder.Build().Run();
 
 

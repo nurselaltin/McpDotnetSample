@@ -36,7 +36,7 @@ namespace MCPServer.Tools
     }
       
     [McpServerTool]
-    public async Task<string> Execute(string userPrompt)
+    public  string Execute(string userPrompt)
     {
       Log.Information("prompt: {userPrompt}", userPrompt);
       var body = new
@@ -58,7 +58,7 @@ namespace MCPServer.Tools
 
       try
       {
-        var response = await _client.ExecutePostAsync(request);
+        var response =  _client.ExecutePost(request);
 
         if (!response.IsSuccessful)
         {
@@ -74,7 +74,7 @@ namespace MCPServer.Tools
           if (content.Contains(toolName, StringComparison.OrdinalIgnoreCase))
           {
             Log.Information("AI yönlendirmesiyle çalıştırılan tool: {Tool}", toolName);
-            return await _toolMap[toolName](userPrompt);
+            return  _toolMap[toolName](userPrompt).Result;
           }
         }
 

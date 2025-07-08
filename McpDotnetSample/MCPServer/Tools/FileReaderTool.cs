@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using ModelContextProtocol.Server;
+using Serilog;
 
 namespace MCPServer.Tools
 {
@@ -24,7 +25,6 @@ namespace MCPServer.Tools
     //  _agent = agent;
     //}
 
-  
     public Task<string> Execute(string path)
     {
       Log.Information("FileReaderTool.Execute çağrıldı. path: {Path}", path);
