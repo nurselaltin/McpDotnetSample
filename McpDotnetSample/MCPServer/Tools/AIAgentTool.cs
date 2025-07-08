@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using ModelContextProtocol.Server;
+﻿using ModelContextProtocol.Server;
 using RestSharp;
 using Serilog;
 
@@ -15,40 +14,27 @@ namespace MCPServer.Tools
     private readonly string _apiKey;
     private readonly string _model;
 
-    private readonly string _systemPrompt = @"
-You are an intelligent router AI assistant. You will receive a user input and select the correct tool to handle it.
-Available tools:
+    private readonly string _systemPrompt;
 
-1. FileReaderTool: Description: Reads content from a file path (e.g. /mcp_server_folders/log.txt).
-Output format:
-{  /mcp_server_folders/log.txt}
-2. SpamClassifierTool: Classifies whether a message is spam.
-
-Instructions:
-Respond only with one of the following tool names: FileReaderTool, SpamClassifierTool.
-If no suitable tool exists, respond with NONE.
-";
-
-    public AIAgentTool(FileReaderTool fileReader, SpamClassifierTool spamClassifier, string apiKey = "", string model = "gpt-3.5-turbo")
+    public AIAgentTool(FileReaderTool fileReader, SpamClassifierTool spamClassifier)
     {
-      //Api Key
-      var conf = new ConfigurationBuilder()
-                 .AddUserSecrets<Program>()
-                 .Build();
-
-      _fileReader = fileReader;
-      _spamClassifier = spamClassifier;
-      _apiKey = apiKey;
-      _model = model;
-      _client = new RestClient("https://api.openai.com/v1/chat/completions");
-
-      _toolMap = new Dictionary<string, Func<string, Task<string>>>(StringComparer.OrdinalIgnoreCase)
-      {
-        { "FileReaderTool", fileReader.Execute },
-        { "SpamClassifierTool", spamClassifier.isSpam }
-      };
+        string promptPath = Path.Combine(AppContext.BaseDirectory, "SystemPrompt.txt");
+        _systemPrompt = File.ReadAllText(promptPath, System.Text.Encoding.UTF8);
+        
+          string key = File.ReadAllText(@"C:\..txt");
+        _fileReader = fileReader;
+        _spamClassifier = spamClassifier;
+        _apiKey = key;
+        _model = "gpt-3.5-turbo";
+        _client = new RestClient("https://api.openai.com/v1/chat/completions");
+        
+          _toolMap = new Dictionary<string, Func<string, Task<string>>>(StringComparer.OrdinalIgnoreCase)
+          {
+            { "FileReaderTool", fileReader.Execute },
+            { "SpamClassifierTool", spamClassifier.isSpam }
+          };
     }
-
+      
     [McpServerTool]
     public async Task<string> Execute(string userPrompt)
     {

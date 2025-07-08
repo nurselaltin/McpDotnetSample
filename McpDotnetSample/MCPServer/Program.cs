@@ -19,7 +19,7 @@ builder.Services.AddSingleton<AIAgentTool>(sp =>
 
   return new AIAgentTool(fileReader, spam);
 });
-//builder.Configuration.AddUserSecrets<Program>();
+builder.Configuration.AddUserSecrets<Program>();
 
 //Serilog ayarları
 Log.Logger = new LoggerConfiguration()
@@ -42,13 +42,8 @@ builder.Services
   .AddMcpServer()
   .WithStdioServerTransport()
   .WithToolsFromAssembly();
-//Api Key
-//var key = builder.Configuration["OpenAI:ApiKey"];
-//string prompt = "Bu spam mail mi?: Subject: You’ve Won a Free iPhone! 📱  \nBody: Congratulations! You’ve been selected for a FREE iPhone 15.  \nClick the link below to claim your reward before midnight:  \n👉 http://scammy-offer.biz/claim-now  \nDon't miss out! This offer is exclusive and expires soon!";
-//string prompt2 = "C:\\mcp_server_folders\\test.txt";
-//var ai = new AIAgentTool(new FileReaderTool(), new SpamClassifierTool(), key);
-//var res = ai.Execute(prompt2);
 
+var ai = new AIAgentTool(new FileReaderTool(), new SpamClassifierTool());
 
 
 await builder.Build().RunAsync();
