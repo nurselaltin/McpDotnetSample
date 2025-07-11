@@ -1,5 +1,4 @@
-﻿using ModelContextProtocol.Server;
-using Serilog;
+﻿using Serilog;
 
 namespace MCPServer.Tools
 {
@@ -13,29 +12,9 @@ namespace MCPServer.Tools
       "/app/data/",
       "/app/logs/"
     };
-    //private readonly string[] allowedPaths = new[]
-    //{
-    //  Path.GetFullPath("/mcp_server_folders")
-    //};
-
-    //private readonly AIAgent _agent;
-
-    //public FileReaderTool(AIAgent agent)
-    //{
-    //  _agent = agent;
-    //}
-
     public Task<string> Execute(string path)
     {
       Log.Information("FileReaderTool.Execute çağrıldı. path: {Path}", path);
-
-
-      //// İzin verilen path kontrolü
-      //if (!allowedPaths.Any(allowed => path.StartsWith(allowed)))
-      //{
-      //  Log.Warning("Erişim reddedildi! path: {Path}, allowedPaths: {AllowedPaths}", path, string.Join(", ", allowedPaths));
-      //  throw new UnauthorizedAccessException("Bu klasöre erişim izni yok.");
-      //}
 
       // Dosya mevcut mu kontrolü
       if (!File.Exists(path))

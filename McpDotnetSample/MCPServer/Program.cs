@@ -1,5 +1,4 @@
-﻿using MCPServer;
-using MCPServer.Tools;
+﻿using MCPServer.Tools;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,11 +39,6 @@ builder.Services
   .AddMcpServer()
   .WithStdioServerTransport()
   .WithToolsFromAssembly();
-
-//var ai = new AIAgentTool(new FileReaderTool(), new SpamClassifierTool());
-//string prompt = "Congratulations! You've won a free vacation to the Maldives. Click here to claim your prize: http://spammy-offers.biz/win";
-//string prompt2 = "C:\\mcp_server_folders\\test.txt";
-//var res = ai.Execute(prompt2);
 
 builder.Build().Run();
 

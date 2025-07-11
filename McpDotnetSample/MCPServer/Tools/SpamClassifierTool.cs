@@ -1,34 +1,12 @@
-﻿using ModelContextProtocol.Server;
-using System.ComponentModel;
-using Serilog;
+﻿using Serilog;
 
 namespace MCPServer.Tools
 {
 
   public  class SpamClassifierTool
   {
-
-    //private readonly AIAgent _agent;
-
-    //public SpamClassifierTool(AIAgent agent)
-    //{
-    //  _agent = agent;
-    //}
-    
     public  Task<string> isSpam(string input)
     {
-      //if (!_agent.CanUseTool("SpamClassifierTool"))
-      //{
-      //  Log.Warning("SpamClassifierTool sistem prompt tarafından engellendi.");
-      //  return Task.FromResult("Bu tool sistem prompt tarafından engellendi.");
-      //}
-
-      //if (_agent.IsSuspiciousInput(input))
-      //{
-      //  Log.Warning("Prompt injection tespit edildi.");
-      //  return Task.FromResult("Yemedim yavrum injectionını :)");
-      //}
-
       Log.Information("SpamClassifierTool.isSpam çağrıldı. input: {Input}", input);
       string result = "";
       var mail = input?.ToLowerInvariant() ?? "";
