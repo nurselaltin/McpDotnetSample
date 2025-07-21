@@ -1,28 +1,55 @@
 ﻿using ModelContextProtocol.Client;
+using Serilog;
 
 // MCP Server ile bağlantı kurmak için transport tanımlıyoruz
 var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
 {
   Name = "MCP Server",
-  Command = @"\McpDotnetSample\McpDotnetSample\MCPServer\bin\Debug\net7.0\MCPServer.exe"
+  Command = @"C:\Users\nursel.altin\source\repos\McpDotnetSample\McpDotnetSample\MCPServer\bin\Debug\net7.0\MCPServer.exe"
 });
 
-// MCP Client nesnesini oluşturuyoruz ve server'a bağlanıyoruz
-var client = await McpClientFactory.CreateAsync(clientTransport);
 
-// Server'da tanımlı tüm tool'ları listeliyoruz
-var tools = await client.ListToolsAsync();
+//Logla
+Log.Logger = new LoggerConfiguration()
+  .MinimumLevel.Debug()
+  .WriteTo.Console()
+  .WriteTo.File(@"C:\logs_mcp\logs_mcpclient\mcpclient-.log",
+                rollingInterval: RollingInterval.Day,
+                retainedFileCountLimit: 7,
+                fileSizeLimitBytes: 10 * 1024 * 1024, // 10MB
+                rollOnFileSizeLimit: true,
+                shared: true,
+                flushToDiskInterval: TimeSpan.FromSeconds(1))
+  .CreateLogger();
 
-foreach (var tool in tools)
+Log.Information("MCP Client başlatılıyor...");
+try
 {
-  Console.WriteLine($"Tool: {tool.Name} - {tool.Description}");
-  if (tool.Name == "Execute")
-    continue;
-  // Tool'a input gönder ve sonucu bekle
-  var result = await tool.CallAsync(new Dictionary<string, object?>
+  var client = await McpClientFactory.CreateAsync(clientTransport);
+  Log.Information("MCP Client bağlantısı kuruldu.");
+
+  var tools = await client.ListToolsAsync();
+  Log.Information($"Server toplam tool sayısı: {tools.Count}");
+
+  foreach (var tool in tools)
   {
-    ["input"] = "URGENT: Your PayPal account has been suspended. Please login to verify your identity."
+    Console.WriteLine($"Tool: {tool.Name} - {tool.Description}");
+    Log.Information($"Tool: {tool.Name} - {tool.Description}");
+  }
+  
+  Console.WriteLine("Prompt giriniz: ");
+  string prompt = Console.ReadLine();
+  Log.Information($"Kullanıcı prompt: {prompt}");
+
+  var toolForPrompt = tools.FirstOrDefault();
+  var res = await toolForPrompt.CallAsync(new Dictionary<string, object?>
+  {
+    ["userPrompt"] = prompt
   });
 
-  Console.WriteLine($"Sonuç: {result}");
+  Log.Information($"Mcp Server response : {res.Content.FirstOrDefault().Text}");
+}
+catch (Exception ex)
+{
+  Log.Error(ex, "Mcp Server hatası.");
 }

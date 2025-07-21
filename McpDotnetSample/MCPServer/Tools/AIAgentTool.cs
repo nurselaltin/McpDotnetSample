@@ -1,6 +1,7 @@
 ﻿using ModelContextProtocol.Server;
 using RestSharp;
 using Serilog;
+using System.ComponentModel;
 
 namespace MCPServer.Tools
 {
@@ -16,12 +17,13 @@ namespace MCPServer.Tools
 
     private readonly string _systemPrompt;
 
+
     public AIAgentTool(FileReaderTool fileReader, SpamClassifierTool spamClassifier)
     {
-        string promptPath = Path.Combine(AppContext.BaseDirectory, "SystemPrompt.txt");
+         string promptPath = Path.Combine(AppContext.BaseDirectory, "SystemPrompt.txt");
         _systemPrompt = File.ReadAllText(promptPath, System.Text.Encoding.UTF8);
         
-          string key = File.ReadAllText(@"C:\..txt");
+         string key = File.ReadAllText(@"C:\..txt");
         _fileReader = fileReader;
         _spamClassifier = spamClassifier;
         _apiKey = key;
@@ -30,22 +32,22 @@ namespace MCPServer.Tools
         
           _toolMap = new Dictionary<string, Func<string, Task<string>>>(StringComparer.OrdinalIgnoreCase)
           {
-            { "FileReaderTool", fileReader.Execute },
-            { "SpamClassifierTool", spamClassifier.isSpam }
+            { "FileReaderTool", _fileReader.Execute },
+            { "SpamClassifierTool", _spamClassifier.isSpam }
           };
     }
-      
-    [McpServerTool]
-    public  string Execute(string userPrompt)
+
+    [McpServerTool, Description("Doğal dil girdisini yorumlayarak, sistemde tanımlı iç tool’lardan hangisinin çağrılması gerektiğine karar verir ve ilgili tool'u çalıştırır.")]
+    public async Task<string> Execute(string userPrompt)
     {
       Log.Information("prompt: {userPrompt}", userPrompt);
       var body = new
       {
         model = _model,
         messages = new[]
-        {
-          new { role = "system", content = _systemPrompt },
-          new { role = "user", content = userPrompt }
+          {
+            new { role = "system", content = _systemPrompt },
+            new { role = "user", content = userPrompt }
         },
         max_tokens = 10,
         temperature = 0
@@ -58,7 +60,7 @@ namespace MCPServer.Tools
 
       try
       {
-        var response =  _client.ExecutePost(request);
+        var response = _client.ExecutePost(request);
 
         if (!response.IsSuccessful)
         {
@@ -74,7 +76,7 @@ namespace MCPServer.Tools
           if (content.Contains(toolName, StringComparison.OrdinalIgnoreCase))
           {
             Log.Information("AI yönlendirmesiyle çalıştırılan tool: {Tool}", toolName);
-            return  _toolMap[toolName](userPrompt).Result;
+            return await _toolMap[toolName](userPrompt); // 👈 burada artık await!
           }
         }
 
@@ -83,8 +85,9 @@ namespace MCPServer.Tools
       catch (Exception ex)
       {
         Log.Error(ex, "RestSharp ile LLM bağlantı hatası.");
-        return "❌ Tool çağrısı sırasında bir hata oluştu.";
+        return $"❌ Tool çağrısı sırasında bir hata oluştu: {ex.Message}";
       }
     }
+
   }
 }

@@ -2,7 +2,6 @@
 
 namespace MCPServer.Tools
 {
-
   public  class SpamClassifierTool
   {
     public  Task<string> isSpam(string input)
