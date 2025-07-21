@@ -5,7 +5,7 @@ using Serilog;
 var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
 {
   Name = "MCP Server",
-  Command = @"C:\Users\nursel.altin\source\repos\McpDotnetSample\McpDotnetSample\MCPServer\bin\Debug\net7.0\MCPServer.exe"
+  Command = @"C:\..\MCPServer.exe"
 });
 
 
